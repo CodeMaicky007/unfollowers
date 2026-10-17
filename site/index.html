@@ -1,0 +1,898 @@
+<title>Unfollowers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Unfollowers">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<style>
+/* Layout: one committed world — electric-blue grid ground, white sheets with big round tops sliding over it,
+   extra-wide black display type with a hard blue extrusion, lime as the only accent. */
+:root{
+  --blue:#0b2bff; --blue-deep:#0016a8; --blue-ink:#000e6b; --lime:#d6ff1a; --ink:#0a0a0f;
+  --paper:#ffffff; --paper-2:#f2f3f7; --line:#e3e5ee; --muted:#5a5f73;
+  --display:"Archivo","Arial Black",Impact,sans-serif;
+  --body:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--blue);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--blue)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+p{margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* display type: extra-wide, black, uppercase */
+.d{font-family:var(--display);font-weight:900;font-stretch:125%;text-transform:uppercase;letter-spacing:-.015em;line-height:.9;text-wrap:balance;margin:0}
+.d-blue{color:var(--blue)} .d-ink{color:var(--ink)} .d-lime{color:var(--lime)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--blue)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+.brand{display:flex;gap:6px;text-decoration:none}
+.chip{display:inline-flex;align-items:center;height:36px;padding:0 16px;border-radius:999px;font-family:var(--display);font-weight:900;font-stretch:125%;font-size:13px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.chip.ink{background:var(--ink);color:#fff}
+.chip.lime{background:var(--lime);color:var(--ink)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{padding:9px 14px;border-radius:999px;color:#fff;text-decoration:none;font-weight:700;font-size:15px}
+.nav-links a:hover{background:rgba(255,255,255,.14)}
+.nav-cta{
+  display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:14px;background:#fff;color:var(--ink);cursor:pointer;
+  font-family:var(--display);font-weight:900;font-stretch:125%;font-size:13px;text-transform:uppercase;letter-spacing:.03em
+}
+.nav-cta:hover{background:var(--lime)}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;height:62px;padding:0 30px;border:0;border-radius:999px;cursor:pointer;text-decoration:none;
+  font-family:var(--display);font-weight:900;font-stretch:125%;font-size:15px;letter-spacing:.02em;text-transform:uppercase;
+  transition:transform .2s cubic-bezier(.2,.9,.2,1.1),box-shadow .2s;
+}
+.btn:active{transform:translateY(2px)}
+.btn .arr{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--lime);font-size:16px;transition:transform .25s}
+.btn:hover .arr{transform:rotate(-45deg)}
+.btn-lime{background:var(--lime);color:var(--ink);box-shadow:0 6px 0 var(--ink)}
+.btn-lime:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--ink)}
+.btn-ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 2px #fff;background:rgba(255,255,255,.08)}
+.btn-ink{background:var(--ink);color:#fff;box-shadow:0 6px 0 var(--blue)}
+.btn-ink .arr{background:var(--lime);color:var(--ink)}
+.btn-ink:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--blue)}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;overflow:hidden;color:#fff;
+  background-color:var(--blue);
+  background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:64px 64px;background-position:center top;
+}
+.hero-top{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:44px 8px}
+.pill-note{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700;font-size:14px}
+.pill-note b{padding:4px 10px;border-radius:999px;background:var(--lime);color:var(--ink);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:11px;letter-spacing:.06em}
+.hero h1{position:relative;margin-top:26px;font-size:clamp(38px,9.6vw,140px);color:#fff;
+  text-shadow:2px 2px 0 var(--blue-deep),4px 4px 0 var(--blue-deep),6px 6px 0 var(--blue-deep),8px 8px 0 var(--blue-deep),10px 10px 0 var(--blue-ink)}
+.hero h1 .line{display:block}
+.hero h1 .d-lime{color:var(--lime)}
+.hero .lede{max-width:36em;margin-top:28px;font-size:19px;color:rgba(255,255,255,.86)}
+.hero .ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:30px}
+
+/* floating frosted cards on top of the headline */
+.float{
+  position:absolute;z-index:3;display:flex;flex-direction:column;align-items:center;gap:5px;width:176px;padding:16px 14px 15px;border-radius:28px;text-align:center;
+  background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.6);color:#fff;
+  backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);
+  box-shadow:0 24px 60px rgba(0,8,90,.35);animation:bob 6s ease-in-out infinite;
+}
+.float .av{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;border:3px solid #fff;font-family:var(--display);font-weight:900;font-stretch:125%;font-size:20px}
+.float strong{font-size:16px;font-weight:800}
+.float span{font-size:13px;color:rgba(255,255,255,.85)}
+.float .tag{margin-top:4px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.float.a{left:3%;bottom:400px;--r:-7deg}
+.float.a .av{background:#ff8ad8;color:var(--ink)}
+.float.a .tag{background:var(--ink);color:var(--lime)}
+.float.b{right:3%;bottom:420px;--r:6deg;animation-delay:-3s}
+.float.b .av{background:var(--lime);color:var(--ink)}
+.float.b .tag{background:#fff;color:var(--blue)}
+@keyframes bob{0%,100%{transform:rotate(var(--r)) translateY(0)}50%{transform:rotate(var(--r)) translateY(-12px)}}
+
+/* rotating lime sticker */
+.sticker{position:absolute;z-index:4;right:6%;bottom:70px;display:grid;place-items:center;width:132px;height:132px;border-radius:50%;background:var(--lime);color:var(--ink);text-decoration:none;box-shadow:0 6px 0 var(--ink)}
+.sticker svg{position:absolute;inset:0;width:100%;height:100%;animation:spin 16s linear infinite}
+.sticker text{font-family:var(--display);font-weight:900;font-stretch:112%;font-size:10px;letter-spacing:.06em;fill:var(--ink)}
+.sticker i{font-style:normal;font-size:32px;font-weight:900;transition:transform .3s}
+.sticker:hover i{transform:rotate(45deg)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* walking crowd */
+.crowd{position:relative;z-index:1;height:360px;margin-top:-10px}
+.crowd canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* ---------- sheets ---------- */
+.sheet{position:relative;z-index:5;background:var(--paper);border-radius:56px 56px 0 0;margin-top:-56px}
+.sheet + .sheet{margin-top:0;border-radius:0}
+.section{padding-block:80px}
+.sheet:first-of-type .section{padding-top:72px}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 40px;margin-bottom:40px}
+.head h2{font-size:clamp(36px,5.6vw,76px)}
+.head p{max-width:30em;color:var(--muted);font-size:17px}
+
+/* duo cards (like "pantallas desde / servicio en el día") */
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.duo-card{display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 28px 32px;border-radius:36px;background:var(--paper-2);text-align:center}
+.duo-card h3{font-size:clamp(28px,3.4vw,44px)}
+.duo-card p{max-width:26em;color:var(--muted);font-weight:600}
+.duo-row{display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px;border-radius:999px;background:var(--blue);color:#fff}
+.duo-row .big{padding:10px 20px;border-radius:999px;background:rgba(255,255,255,.14);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:20px}
+.duo-row .small{padding:0 16px 0 6px;font-weight:700;font-size:14px;text-align:left;line-height:1.2}
+.duo-row.lime{background:var(--lime);color:var(--ink)}
+.duo-row.lime .big{background:var(--ink);color:var(--lime)}
+
+/* feature list */
+.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.feat{display:flex;flex-direction:column;gap:12px;padding:30px 28px;border-radius:32px;border:2px solid var(--line);background:var(--paper)}
+.feat .k{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--blue);color:var(--lime);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:20px;box-shadow:4px 4px 0 var(--blue-deep)}
+.feat h3{font-size:22px;line-height:1}
+.feat p{color:var(--muted);font-size:16px}
+kbd{display:inline-block;min-width:1.7em;padding:1px 7px;border-radius:8px;background:var(--ink);color:var(--lime);font:800 .8em/1.5 var(--body);text-align:center;white-space:nowrap}
+
+/* showcase */
+.show{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center;padding:52px;border-radius:44px;color:#fff;
+  background-color:var(--blue);background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:44px 44px}
+.show h2{font-size:clamp(36px,5vw,70px);text-shadow:4px 4px 0 var(--blue-deep),8px 8px 0 var(--blue-ink)}
+.show p{margin-top:20px;max-width:28em;color:rgba(255,255,255,.86);font-size:18px}
+.show ul{margin:22px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.show li{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;font-size:14px}
+.show figure{margin:0;justify-self:center;width:min(100%,380px)}
+.show img{display:block;width:100%;max-width:100%;height:auto;border-radius:26px;border:4px solid var(--ink);box-shadow:12px 12px 0 var(--ink);transform:rotate(3deg)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:0;padding:0;list-style:none;counter-reset:s}
+.step{position:relative;display:flex;flex-direction:column;gap:10px;padding:30px 28px;border-radius:32px;background:var(--paper-2)}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:46px;line-height:1;color:var(--blue)}
+.step h3{font-size:21px;line-height:1.05}
+.step p{color:var(--muted);font-size:16px}
+.step code{padding:2px 7px;border-radius:7px;background:var(--paper);color:var(--ink);font:700 .9em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.step.hot{background:var(--lime)}
+.step.hot::before{color:var(--ink)}
+.step.hot p{color:var(--ink)}
+.note{margin-top:20px;padding:16px 22px;border-radius:22px;background:var(--paper-2);color:var(--muted);font-size:16px}
+.note b{color:var(--ink)}
+
+/* safety */
+.safe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.safe-card{padding:34px 32px;border-radius:36px;background:var(--ink);color:#fff}
+.safe-card h3{font-size:26px;color:var(--lime);margin-bottom:18px}
+.safe-card ul{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+.safe-card li{position:relative;padding-left:32px;color:rgba(255,255,255,.86);font-size:16px}
+.safe-card li::before{content:"";position:absolute;left:0;top:.3em;width:18px;height:18px;border-radius:50%;background:var(--lime)}
+.safe-card.warn{background:var(--paper-2);color:var(--ink)}
+.safe-card.warn h3{color:var(--blue)}
+.safe-card.warn li{color:var(--muted)}
+.safe-card.warn li::before{background:#ff3b30}
+.times{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.times span{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:800;font-size:14px}
+
+/* faq */
+.faq{display:grid;gap:12px;max-width:880px}
+.faq details{border-radius:26px;background:var(--paper-2);padding:0 26px}
+.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:18px;padding-block:22px;font-weight:800;font-size:18px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--display);font-weight:900;font-size:20px;transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg);background:var(--ink);color:var(--lime)}
+.faq details p{padding-bottom:22px;max-width:62ch;color:var(--muted)}
+
+/* final band */
+.final{padding-block:90px 70px;text-align:center;color:#fff}
+.final h2{font-size:clamp(46px,9vw,130px);text-shadow:3px 3px 0 var(--blue-deep),6px 6px 0 var(--blue-deep),9px 9px 0 var(--blue-ink)}
+.final p{margin:22px auto 0;max-width:30em;color:rgba(255,255,255,.86);font-size:18px}
+.final .btn{margin-top:30px}
+footer{padding-block:28px 44px;color:rgba(255,255,255,.75);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;border-top:1px solid rgba(255,255,255,.18);padding-top:24px}
+
+/* copy fallback + toast */
+.code-box{width:100%;max-width:720px;margin-top:18px;text-align:left}
+.code-box label{display:block;margin-bottom:8px;font-size:14px;font-weight:600;color:rgba(255,255,255,.9)}
+.code-box textarea{width:100%;height:150px;padding:14px;border-radius:18px;border:2px solid var(--ink);background:#fff;color:var(--ink);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:40;transform:translate(-50%,140%);padding:14px 22px;border-radius:999px;background:var(--ink);color:#fff;font-weight:700;box-shadow:0 6px 0 var(--lime);transition:transform .35s cubic-bezier(.2,.9,.2,1.1);max-width:calc(100% - 32px);text-align:center}
+.toast.on{transform:translate(-50%,0)}
+
+
+/* mobile tabs */
+.tabs{display:inline-flex;gap:6px;padding:6px;margin-bottom:22px;border-radius:999px;background:var(--paper-2)}
+.tab{height:46px;padding:0 22px;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--display);font-weight:900;font-stretch:125%;font-size:13px;text-transform:uppercase;letter-spacing:.03em;transition:background .2s,color .2s}
+.tab:hover{color:var(--ink)}
+.tab.is-on{background:var(--ink);color:var(--lime)}
+.steps-m{grid-template-columns:repeat(4,minmax(0,1fr))}
+#panel-mark .steps-m{grid-template-columns:repeat(3,minmax(0,1fr))}
+.step a{color:inherit;font-weight:700}
+.btn-sm{height:48px;padding:0 10px 0 20px;font-size:12.5px;align-self:flex-start;margin-top:auto}
+.btn-sm .arr{width:30px;height:30px}
+.step.hot .btn-sm{box-shadow:0 5px 0 var(--blue)}
+.note a{color:var(--blue);font-weight:800}
+.install-btn{background:var(--lime)}
+@media (max-width:1020px){.steps-m,#panel-mark .steps-m{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){
+  .steps-m,#panel-mark .steps-m{grid-template-columns:minmax(0,1fr)}
+  .tabs{display:flex;width:100%}
+  .tab{flex:1;padding:0 8px;font-size:12px}
+  .nav-cta.js-copy{display:none}
+  .btn-sm{width:auto}
+}
+
+[hidden]{display:none !important}
+/* install wizard */
+.wiz{padding:22px;border-radius:40px;background:var(--paper-2)}
+.wiz-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px;padding:4px 6px 18px}
+.wiz-dev{font-weight:600;color:var(--muted)}
+.wiz-dev b{color:var(--ink)}
+.wiz-other{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--muted)}
+.wiz-other select{height:40px;max-width:100%;padding:0 12px;border-radius:999px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.wiz-steps{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.wstep{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px 22px;padding:22px 24px;border-radius:30px;border:2px solid var(--line);background:var(--paper);transition:border-color .25s,box-shadow .25s,opacity .25s}
+.wstep.current{border-color:var(--ink);box-shadow:8px 8px 0 var(--blue)}
+.wstep.done{opacity:.72}
+.wnum{position:relative;display:grid;place-items:center;width:58px;height:58px;border-radius:18px;background:var(--blue);color:var(--lime);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:24px;box-shadow:4px 4px 0 var(--blue-deep)}
+.wnum b{display:none}
+.wstep.done .wnum{background:var(--lime);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.wstep.done .wnum i{display:none}
+.wstep.done .wnum b{display:block}
+.wnum i{font-style:normal}
+.wbody{display:flex;flex-direction:column;gap:6px;min-width:0}
+.wbody h3{font-size:22px;line-height:1}
+.wbody p{color:var(--muted);font-size:16px}
+.wbody b{color:var(--ink)}
+.wtip{padding:10px 14px;border-radius:14px;background:#fff7d6;color:#5c4a00 !important;font-size:14px !important}
+.wbtn{align-self:center;margin:0;white-space:nowrap}
+.btn-ghost-ink{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);height:44px;padding:0 18px;font-size:12px}
+.btn-ghost-ink:hover{background:var(--ink);color:var(--lime)}
+.wfix{margin-top:4px}
+.wfix summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--blue)}
+.wfix p{margin:8px 0 10px;font-size:14px !important}
+.wiz-move{display:flex;flex-direction:column;gap:10px;padding:26px;border-radius:30px;background:var(--ink);color:#fff}
+.wiz-move h3{font-size:26px;color:var(--lime)}
+.wiz-move p{color:rgba(255,255,255,.85)}
+.wiz-move .btn-ghost-ink{color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.wiz-move .btn-ghost-ink:hover{background:#fff;color:var(--ink)}
+.wiz-move .btn-ink{background:var(--lime);color:var(--ink);box-shadow:0 5px 0 var(--blue)}
+.wiz-move .btn-ink .arr{background:var(--ink);color:var(--lime)}
+.wiz-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.alt-mark{margin-top:18px;padding:0 22px;border-radius:24px;border:2px dashed var(--line)}
+.alt-mark summary{cursor:pointer;padding-block:16px;font-weight:800}
+.alt-mark p{color:var(--muted);font-size:15px}
+.alt-mark code{padding:1px 6px;border-radius:6px;background:var(--paper-2);font:700 .9em ui-monospace,Menlo,monospace}
+.alt-mark .btn{margin:12px 0 18px}
+@media (hover:hover) and (pointer:fine){
+  .wstep:hover{border-color:var(--ink)}
+  .wstep:hover .wnum{transform:rotate(-8deg) scale(1.06)}
+  .wnum{transition:transform .35s cubic-bezier(.2,.9,.2,1.5)}
+}
+@media (max-width:720px){
+  .wiz{padding:14px;border-radius:30px}
+  .wstep{grid-template-columns:auto minmax(0,1fr);padding:18px;gap:14px}
+  .wbtn{grid-column:1 / -1;width:100%}
+  .wnum{width:48px;height:48px;font-size:20px;border-radius:15px}
+  .wiz-other{width:100%}
+  .wiz-other select{flex:1;min-width:0;width:100%}
+}
+@media (max-width:1180px){.float{display:none}}
+@media (max-width:1020px){
+  .sticker{width:108px;height:108px}
+  .feats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .show{grid-template-columns:minmax(0,1fr);padding:40px 28px}
+}
+@media (max-width:720px){
+  body{font-size:16px}
+  .nav-links a{display:none}
+  .duo,.feats,.steps,.safe{grid-template-columns:minmax(0,1fr)}
+  .hero-top{padding-top:28px}
+  .hero .lede{font-size:17px}
+  .btn{width:100%}
+  .crowd{height:250px}
+  .sticker{display:none}
+  .sheet{border-radius:36px 36px 0 0;margin-top:-36px}
+  .section{padding-block:56px}
+  .duo-card{padding:32px 20px 26px}
+  .duo-row .big{font-size:16px;padding:9px 14px}
+  .show{border-radius:32px}
+}
+
+/* ---------- interaction ---------- */
+@media (hover:hover) and (pointer:fine){
+  .tilt{
+    --rx:0deg;--ry:0deg;--lift:0px;--mx:50%;--my:50%;
+    transform:perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift));
+    transition:transform .35s cubic-bezier(.2,.9,.2,1.05),box-shadow .3s,background-color .25s,border-color .25s,color .25s;
+    will-change:transform;
+  }
+  .tilt.is-live{transition:transform .08s linear,box-shadow .3s,background-color .25s,border-color .25s,color .25s}
+  .tilt:hover{--lift:-6px}
+  /* cursor spotlight */
+  .feat:hover,.duo-card:hover,.faq details:hover{background-image:radial-gradient(260px circle at var(--mx) var(--my),rgba(11,43,255,.10),transparent 65%)}
+  .step:hover{background-image:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.16),transparent 65%)}
+
+  .duo-card:hover{box-shadow:10px 10px 0 var(--blue)}
+  .duo-card .duo-row{transition:transform .35s cubic-bezier(.2,.9,.2,1.3)}
+  .duo-card:hover .duo-row{transform:scale(1.07) rotate(-2deg)}
+  .duo-card h3 span{display:inline-block;transition:transform .35s cubic-bezier(.2,.9,.2,1.3)}
+  .duo-card:hover h3 span:first-child{transform:translateX(-6px)}
+  .duo-card:hover h3 span:last-child{transform:translateX(6px)}
+
+  .feat:hover{border-color:var(--ink);box-shadow:8px 8px 0 var(--blue)}
+  .feat .k{transition:transform .4s cubic-bezier(.2,.9,.2,1.4),background .2s,color .2s}
+  .feat:hover .k{transform:rotate(-12deg) scale(1.15);background:var(--lime);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+
+  .step:hover{background-color:var(--blue);color:#fff;box-shadow:8px 8px 0 var(--ink)}
+  .step:hover p{color:rgba(255,255,255,.85)}
+  .step:hover::before{color:var(--lime)}
+  .step::before{display:inline-block;transition:transform .4s cubic-bezier(.2,.9,.2,1.4),color .2s}
+  .step:hover::before{transform:translateX(6px) rotate(-6deg)}
+  .step.hot:hover{background-color:var(--ink);color:var(--lime)}
+  .step.hot:hover p{color:#fff}
+  .step:hover code{background:rgba(255,255,255,.15);color:inherit}
+
+  .safe-card{transition:transform .35s cubic-bezier(.2,.9,.2,1.05),box-shadow .3s}
+  .safe-card:hover{transform:translateY(-6px);box-shadow:10px 10px 0 var(--blue)}
+  .safe-card li{transition:transform .25s,color .2s}
+  .safe-card li::before{transition:transform .3s cubic-bezier(.2,.9,.2,1.6)}
+  .safe-card li:hover{transform:translateX(6px);color:#fff}
+  .safe-card.warn li:hover{color:var(--ink)}
+  .safe-card li:hover::before{transform:scale(1.35)}
+  .times span{transition:background .2s,color .2s,transform .25s}
+  .times span:hover{background:var(--lime);color:var(--ink);transform:translateY(-3px)}
+
+  .faq details{transition:background-color .2s,transform .25s}
+  .faq details:hover{transform:translateX(6px)}
+  .faq details:hover summary::after{transform:rotate(90deg)}
+  .faq details[open]:hover summary::after{transform:rotate(45deg)}
+
+  .show figure{transition:transform .35s}
+  .show img{transition:transform .5s cubic-bezier(.2,.9,.2,1.2),box-shadow .4s}
+  .show figure:hover img{transform:rotate(0deg) scale(1.03);box-shadow:16px 16px 0 var(--lime)}
+  .show li{transition:background .2s,color .2s,transform .25s}
+  .show li:hover{background:var(--lime);color:var(--ink);transform:translateY(-3px) rotate(-2deg)}
+
+  .float{cursor:default;transition:transform .4s cubic-bezier(.2,.9,.2,1.2),background .25s}
+  .float:hover{animation-play-state:paused;transform:rotate(0deg) scale(1.08) !important;background:rgba(255,255,255,.32)}
+  .float:hover .tag{animation:wiggle .5s ease}
+  .float .av{transition:transform .4s cubic-bezier(.2,.9,.2,1.6)}
+  .float:hover .av{transform:scale(1.15) rotate(-8deg)}
+  .sticker{transition:transform .35s cubic-bezier(.2,.9,.2,1.4),box-shadow .3s}
+  .sticker:hover{transform:scale(1.12) rotate(-8deg);box-shadow:0 10px 0 var(--ink)}
+  .chip{transition:transform .3s cubic-bezier(.2,.9,.2,1.6)}
+  .brand:hover .chip.ink{transform:rotate(-5deg)}
+  .brand:hover .chip.lime{transform:rotate(6deg) scale(1.1)}
+  .crowd canvas{cursor:pointer}
+}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.crowd-hint{position:absolute;left:50%;bottom:18px;z-index:2;transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:rgba(10,10,15,.55);color:#fff;font-size:12px;font-weight:700;pointer-events:none;transition:opacity .4s}
+.crowd-hint.gone{opacity:0}
+@media (hover:none){.crowd-hint{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+}
+</style>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Unfollowers, inicio"><span class="chip ink">Unfollowers</span><span class="chip lime">v4</span></a>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#funciones">Funciones</a>
+      <a href="#pasos">Cómo usarlo</a>
+      <a href="#instalar">Instalar</a>
+      <a href="#preguntas">Preguntas</a>
+      <button class="nav-cta install-btn" id="install-btn" type="button" hidden>Instalar app</button>
+      <button class="nav-cta js-copy" type="button">Copiar script</button>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-top">
+      <span class="pill-note"><b>GRATIS</b>Sin contraseña · Desde tu navegador</span>
+      <h1 class="d" id="hero-title"><span class="line">¿Quién no</span><span class="line d-lime">te sigue?</span></h1>
+      <p class="lede">Escanea las cuentas que sigues, descubre cuáles no te siguen de vuelta y deja de seguir solo a las que tú elijas.</p>
+      <div class="ctas">
+        <button class="btn btn-lime js-copy" type="button">Copiar el script <span class="arr" aria-hidden="true">↗</span></button>
+        <a class="btn btn-ghost" href="#instalar">Instalar en 3 toques</a>
+      </div>
+      <div class="code-box" id="code-box" hidden>
+        <label for="code-area">Tu navegador no deja copiar automáticamente. Selecciona todo con <kbd>Ctrl</kbd> + <kbd>A</kbd> y cópialo:</label>
+        <textarea id="code-area" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="float a" aria-hidden="true"><span class="av">AF</span><strong>@alina.frames</strong><span>La sigues desde 2021</span><span class="tag">No te sigue</span></div>
+    <div class="float b" aria-hidden="true"><span class="av">JS</span><strong>@juniper.signal</strong><span>Cuenta verificada</span><span class="tag">Te sigue ✓</span></div>
+    <a class="sticker" href="#pasos" aria-label="Ver los pasos">
+      <svg viewBox="0 0 132 132" aria-hidden="true"><defs><path id="ring" d="M66,66 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"/></defs><text textLength="290" lengthAdjust="spacing"><textPath href="#ring" textLength="290" lengthAdjust="spacing">GRATIS · SIN CONTRASEÑA · DESDE TU NAVEGADOR ·</textPath></text></svg>
+      <i aria-hidden="true">↗</i>
+    </a>
+
+    <div class="crowd" aria-hidden="true"><canvas id="crowd"></canvas><span class="crowd-hint" id="crowd-hint">Pasa el ratón por la gente 👋</span></div>
+  </section>
+
+  <section class="sheet" id="funciones">
+    <div class="wrap section">
+      <div class="duo">
+        <article class="duo-card tilt">
+          <h3 class="d"><span class="d-blue">Escanea</span><br><span class="d-ink">tu cuenta</span></h3>
+          <p>Lee tus seguidores y tus seguidos y te enseña quién no te sigue de vuelta.</p>
+          <div class="duo-row"><span class="big">2 listas</span><span class="small">seguidores<br>y seguidos</span></div>
+        </article>
+        <article class="duo-card tilt">
+          <h3 class="d"><span class="d-blue">Deja de seguir</span><br><span class="d-ink">de verdad</span></h3>
+          <p>Después de cada cuenta pregunta a Instagram si ya no la sigues. Solo la marca en verde si lo confirma.</p>
+          <div class="duo-row lime"><span class="big">✓ 1 a 1</span><span class="small">verificado<br>con Instagram</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <div class="wrap section" style="padding-top:20px">
+      <div class="head">
+        <h2 class="d"><span class="d-ink">Todo lo</span><br><span class="d-blue">que hace</span></h2>
+        <p>Revisas, eliges y confirmas antes de que pase nada. Nada se envía fuera de tu navegador.</p>
+      </div>
+      <div class="feats">
+        <article class="feat tilt"><span class="k">✓</span><h3 class="d">Confirmación previa</h3><p>Antes de empezar ves las caras de las cuentas elegidas, el total y el tiempo estimado.</p></article>
+        <article class="feat tilt"><span class="k">A–Z</span><h3 class="d">Ordenar y filtrar</h3><p>Seguidos recientemente, verificados primero, sin foto, privadas… o de la A a la Z.</p></article>
+        <article class="feat tilt"><span class="k">★</span><h3 class="d">Lista blanca</h3><p>Guarda las cuentas que quieres mantener aunque no te sigan, como marcas o amigos.</p></article>
+        <article class="feat tilt"><span class="k">⇧</span><h3 class="d">Selección rápida</h3><p><kbd>Shift</kbd> + clic marca todas las cuentas entre dos de un golpe.</p></article>
+        <article class="feat tilt"><span class="k">/</span><h3 class="d">Atajos de teclado</h3><p><kbd>/</kbd> busca, <kbd>←</kbd> <kbd>→</kbd> cambian de página, <kbd>T</kbd> cambia el tema, <kbd>?</kbd> ayuda.</p></article>
+        <article class="feat tilt"><span class="k">☾</span><h3 class="d">Claro u oscuro</h3><p>Cambia el tema con un botón y se queda guardado. En español por defecto.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <div class="wrap section" style="padding-top:20px">
+      <div class="show">
+        <div>
+          <h2 class="d">Comparte<br><span class="d-lime">el resultado</span></h2>
+          <p>Al terminar ves cuántas cuentas dejaste de seguir, cuántas fallaron y cuánto tardó. Lo descargas como imagen en vertical, lista para historias.</p>
+          <ul><li>Cuentas dejadas de seguir</li><li>% de éxito</li><li>Duración</li><li>Fallidas, con su nombre</li></ul>
+        </div>
+        <figure class="tilt" data-tilt-max="10"><img src="img/resumen.webp" width="960" height="1200" alt="Imagen de resumen de ejemplo: 8 cuentas dejadas de seguir, 1 fallida, 89 % de éxito"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="pasos">
+    <div class="wrap section">
+      <div class="head">
+        <h2 class="d"><span class="d-ink">De la consola</span><br><span class="d-blue">a tu lista limpia</span></h2>
+        <p>Seis pasos y menos de un minuto. Solo hace falta el ordenador y Chrome, Edge o Brave.</p>
+      </div>
+      <ol class="steps">
+        <li class="step tilt"><h3 class="d">Copia el script</h3><p>Pulsa <b>Copiar el script</b> en esta página.</p></li>
+        <li class="step tilt"><h3 class="d">Entra en Instagram</h3><p>Abre <code>instagram.com</code> en el ordenador, con tu sesión iniciada.</p></li>
+        <li class="step tilt"><h3 class="d">Abre la consola</h3><p><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>. En Mac, <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>J</kbd>.</p></li>
+        <li class="step hot tilt"><h3 class="d">Permite pegar</h3><p>Solo la primera vez: escribe a mano <code>allow pasting</code> (o <code>permitir pegar</code> si Chrome está en español) y pulsa Enter.</p></li>
+        <li class="step tilt"><h3 class="d">Pega y Enter</h3><p><kbd>Ctrl</kbd> + <kbd>V</kbd> y Enter. Instagram se convierte en la herramienta.</p></li>
+        <li class="step tilt"><h3 class="d">Escanea y elige</h3><p>Lanza el escaneo, marca las cuentas y confirma.</p></li>
+      </ol>
+      <p class="note"><b>¿Desde el móvil?</b> La consola no existe en el móvil, pero puedes usarlo con un botón dentro de Instagram. <a href="#instalar">Mira cómo</a>. Para quitar la herramienta, recarga Instagram.</p>
+    </div>
+  </section>
+
+  <section class="sheet" id="instalar">
+    <div class="wrap section" style="padding-top:20px">
+      <div class="head">
+        <h2 class="d"><span class="d-ink">Instálalo</span><br><span class="d-blue">en 3 toques</span></h2>
+        <p>Una vez instalado, tendrás un botón <b>Unfollowers</b> dentro de Instagram cada vez que lo abras en este navegador. Sin consola y sin copiar código.</p>
+      </div>
+
+      <div class="wiz" id="wiz">
+        <div class="wiz-top">
+          <span class="wiz-dev">Tu dispositivo: <b id="wiz-device">…</b></span>
+          <label class="wiz-other">¿Otro? <select id="wiz-select" aria-label="Elegir dispositivo">
+            <option value="firefox">Ordenador · Firefox</option>
+            <option value="chrome">Ordenador · Chrome, Edge, Brave u Opera</option>
+            <option value="safari-mac">Mac · Safari</option>
+            <option value="firefox-android">Android · Firefox</option>
+            <option value="chrome-android">Android · Chrome u otro</option>
+            <option value="safari-ios">iPhone o iPad · Safari</option>
+            <option value="other-ios">iPhone o iPad · Chrome u otro</option>
+            <option value="inapp">Dentro de la app de Instagram</option>
+          </select></label>
+        </div>
+
+        <div class="wiz-move" id="wiz-move" hidden>
+          <h3 class="d" id="wiz-move-title">Ábrelo en otro navegador</h3>
+          <p id="wiz-move-text"></p>
+          <div class="wiz-actions">
+            <a class="btn btn-ink btn-sm" id="wiz-move-get" href="#" target="_blank" rel="noopener">Descargar <span class="arr" aria-hidden="true">↗</span></a>
+            <button class="btn btn-ghost-ink btn-sm" id="wiz-copy-link" type="button">Copiar enlace de esta web</button>
+          </div>
+        </div>
+
+        <ol class="wiz-steps" id="wiz-steps">
+          <li class="wstep" data-step="1">
+            <span class="wnum" aria-hidden="true"><i>1</i><b>✓</b></span>
+            <div class="wbody">
+              <h3 class="d">Instala <span id="mgr-name">Violentmonkey</span></h3>
+              <p id="mgr-text">Es gratis. Pulsa el botón y luego <b>Añadir</b>.</p>
+              <p class="wtip" id="mgr-tip" hidden></p>
+            </div>
+            <a class="btn btn-ink btn-sm wbtn" id="mgr-link" href="#" target="_blank" rel="noopener">Instalar extensión <span class="arr" aria-hidden="true">↗</span></a>
+          </li>
+          <li class="wstep" data-step="2">
+            <span class="wnum" aria-hidden="true"><i>2</i><b>✓</b></span>
+            <div class="wbody">
+              <h3 class="d">Añade Unfollowers</h3>
+              <p id="us-text">Se abrirá la pantalla de la extensión. Pulsa <b>Instalar</b>.</p>
+              <details class="wfix">
+                <summary>¿No se abrió la pantalla de instalación?</summary>
+                <p>Copia el código, abre la extensión, pulsa <b>+</b> (nuevo script), borra lo que haya, pega y guarda.</p>
+                <button class="btn btn-ghost-ink btn-sm js-copy-us" type="button">Copiar código</button>
+              </details>
+            </div>
+            <a class="btn btn-lime btn-sm wbtn" id="us-link" href="instagram-unfollowers.user.js" target="_blank" rel="noopener">Añadir Unfollowers <span class="arr" aria-hidden="true">↗</span></a>
+          </li>
+          <li class="wstep" data-step="3">
+            <span class="wnum" aria-hidden="true"><i>3</i><b>✓</b></span>
+            <div class="wbody">
+              <h3 class="d">Abre Instagram</h3>
+              <p>Entra con tu cuenta y pulsa el botón lima <b>Unfollowers</b> de abajo a la derecha.</p>
+            </div>
+            <a class="btn btn-ink btn-sm wbtn" id="ig-link" href="https://www.instagram.com/" target="_blank" rel="noopener">Abrir Instagram <span class="arr" aria-hidden="true">↗</span></a>
+          </li>
+        </ol>
+      </div>
+
+      <details class="alt-mark">
+        <summary>Otra opción: como marcador del navegador</summary>
+        <p>Copia el marcador, guarda cualquier página en marcadores y edítalo: nombre <code>unfollowers</code> y en la dirección pega lo copiado. Luego, en instagram.com, ábrelo desde tus marcadores. Algunos navegadores no ejecutan marcadores tan largos.</p>
+        <button class="btn btn-ghost-ink btn-sm js-copy-mark" type="button">Copiar marcador</button>
+      </details>
+    </div>
+  </section>
+
+  <section class="sheet" id="seguridad">
+    <div class="wrap section" style="padding-top:20px">
+      <div class="head">
+        <h2 class="d"><span class="d-ink">Despacio</span><br><span class="d-blue">a propósito</span></h2>
+        <p>Instagram bloquea unas horas a quien hace muchas acciones seguidas. Por eso el script espera entre cuentas.</p>
+      </div>
+      <div class="safe">
+        <div class="safe-card">
+          <h3 class="d">Lo que hace por ti</h3>
+          <ul>
+            <li>Funciona en tu navegador, con tu sesión. No pide tu contraseña ni envía tus datos a ningún servidor.</li>
+            <li>Espera entre cuentas y hace pausas largas cada pocas acciones.</li>
+            <li>Si Instagram avisa de un bloqueo, se para solo.</li>
+          </ul>
+          <div class="times"><span>4 s entre cuentas</span><span>5 min cada 5</span><span>Parada si hay bloqueo</span></div>
+        </div>
+        <div class="safe-card warn">
+          <h3 class="d">Lo que debes saber</h3>
+          <ul>
+            <li>Deja de seguir a pocas cuentas al día. Cientos de golpe es la forma más rápida de acabar bloqueado.</li>
+            <li>No bajes los tiempos de los ajustes por debajo de los que vienen por defecto.</li>
+            <li>Automatizar acciones puede ir contra las normas de Instagram. Lo usas bajo tu responsabilidad.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="preguntas">
+    <div class="wrap section" style="padding-top:20px">
+      <div class="head"><h2 class="d"><span class="d-ink">Preguntas</span><br><span class="d-blue">frecuentes</span></h2></div>
+      <div class="faq">
+        <details class="tilt"><summary>¿Necesita mi contraseña?</summary><p>No. Se ejecuta dentro de la página de Instagram donde ya tienes la sesión iniciada, igual que si fueras tú pulsando los botones.</p></details>
+        <details class="tilt"><summary>¿Me pueden bloquear la cuenta?</summary><p>Si haces muchas acciones seguidas, Instagram puede bloquearte unas horas. El script espera entre cuentas y se para solo si detecta el bloqueo. Aun así, lo más seguro es dejar de seguir a pocas cuentas al día.</p></details>
+        <details class="tilt"><summary>¿Por qué tarda tanto en dejar de seguir?</summary><p>Por las pausas de seguridad: unos segundos entre cuentas y 5 minutos cada 5. Antes de empezar te enseña el tiempo estimado.</p></details>
+        <details class="tilt"><summary>Chrome no me deja pegar en la consola</summary><p>Es una protección de Chrome. La primera vez escribe a mano <kbd>allow pasting</kbd> (o <kbd>permitir pegar</kbd> en español), pulsa Enter y vuelve a pegar.</p></details>
+        <details class="tilt"><summary>¿Funciona en el móvil?</summary><p>Sí, en el navegador del móvil con una extensión gratuita: Firefox con Violentmonkey en Android, o Safari con Userscripts en iPhone. En la app de Instagram y en Chrome para móvil no funciona. Tienes los pasos en la sección <a href="#instalar">Instalar</a>.</p></details>
+        <details class="tilt"><summary>¿Cómo quito la herramienta?</summary><p>Recarga la página de Instagram. Tu lista blanca y tus ajustes se quedan guardados para la próxima vez.</p></details>
+        <details class="tilt"><summary>¿De dónde sale?</summary><p>Es una versión modificada del proyecto abierto <a href="https://github.com/davidarroyo1234/InstagramUnfollowers" target="_blank" rel="noopener">InstagramUnfollowers</a>, con diseño nuevo y más funciones.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <h2 class="d">¿Listo?<br><span class="d-lime">Copia y pega.</span></h2>
+      <p>Copia el script, abre Instagram en el ordenador y sigue los seis pasos.</p>
+      <button class="btn btn-lime js-copy" type="button">Copiar el script <span class="arr" aria-hidden="true">↗</span></button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Unfollowers v4 · No está afiliado a Instagram ni a Meta.</span>
+    <span>Ilustraciones: Open Peeps, de Pablo Stanley (CC0). Animación de la multitud inspirada en Skiper UI.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* ---------- copy script ---------- */
+(function () {
+  var code = null, toast = document.getElementById('toast'), box = document.getElementById('code-box'), area = document.getElementById('code-area'), t;
+  function say(msg) { toast.textContent = msg; toast.classList.add('on'); clearTimeout(t); t = setTimeout(function () { toast.classList.remove('on'); }, 3200); }
+  fetch('instagram-unfollowers.js').then(function (r) { if (!r.ok) throw 0; return r.text(); })
+    .then(function (s) { code = s; area.value = s; })
+    .catch(function () { say('No se pudo cargar el script. Recarga la página.'); });
+  function fallback() {
+    box.hidden = false; say('Selecciona el código y cópialo a mano');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' }); area.focus(); area.select();
+  }
+  document.querySelectorAll('.js-copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!code) { say('Cargando el script… pulsa otra vez en un segundo'); return; }
+      if (!navigator.clipboard || !navigator.clipboard.writeText) return fallback();
+      navigator.clipboard.writeText(code).then(function () { say('✓ Copiado. Ahora ábrelo en Instagram'); }, fallback);
+    });
+  });
+})();
+
+
+
+/* ---------- install wizard, bookmarklet, app install, offline ---------- */
+(function () {
+  var toast = document.getElementById('toast'), tt;
+  function say(m) { toast.textContent = m; toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('on'); }, 3400); }
+  function copyText(text, ok) {
+    if (!navigator.clipboard) { say('Tu navegador no deja copiar automáticamente'); return; }
+    navigator.clipboard.writeText(text).then(function () { say(ok); }, function () { say('Tu navegador no deja copiar automáticamente'); });
+  }
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  var VM_TEXT = 'Es gratis. Pulsa el botón y luego <b>Añadir a Firefox</b>.';
+  var P = {
+    'firefox':        { dev: 'Ordenador con Firefox', mgr: 'Violentmonkey', url: 'https://addons.mozilla.org/firefox/addon/violentmonkey/', text: VM_TEXT },
+    'firefox-android':{ dev: 'Android con Firefox', mgr: 'Violentmonkey', url: 'https://addons.mozilla.org/android/addon/violentmonkey/', text: VM_TEXT },
+    'chrome':         { dev: 'Ordenador con Chrome, Edge o Brave', mgr: 'Tampermonkey', url: 'https://www.tampermonkey.net/',
+                        text: 'Es gratis. En su web pulsa <b>Descargar</b> y luego <b>Añadir</b>.',
+                        tip: 'En Chrome y Edge, después de instalarla: Extensiones → Tampermonkey → <b>Detalles</b> y activa <b>Permitir scripts de usuario</b>.' },
+    'safari-mac':     { dev: 'Mac con Safari', mgr: 'Userscripts', url: 'https://apps.apple.com/app/id1463298887',
+                        text: 'Instala la app gratuita y actívala en Safari → Ajustes → <b>Extensiones</b>.',
+                        us: 'Pulsa el botón y luego el icono de <b>Userscripts</b> en la barra de Safari → <b>Instalar</b>.' },
+    'safari-ios':     { dev: 'iPhone con Safari', mgr: 'Userscripts', url: 'https://apps.apple.com/app/id1463298887',
+                        text: 'Instala la app gratuita y ábrela una vez. Luego en Safari toca <b>aA</b> → <b>Gestionar extensiones</b> y activa Userscripts.',
+                        us: 'Toca el botón y luego <b>aA</b> → <b>Userscripts</b> → <b>Instalar</b>.' },
+    'chrome-android': { dev: 'Android con Chrome', move: true, title: 'Usa Firefox en Android',
+                        text: 'Chrome para Android no admite extensiones. Instala Firefox (gratis), abre esta misma web en Firefox y sigue los 3 pasos.',
+                        get: 'https://play.google.com/store/apps/details?id=org.mozilla.firefox', getLabel: 'Descargar Firefox' },
+    'other-ios':      { dev: 'iPhone con otro navegador', move: true, title: 'Usa Safari en el iPhone',
+                        text: 'En iPhone solo Safari admite extensiones. Copia el enlace de esta web y ábrelo en Safari.' },
+    'inapp':          { dev: 'App de Instagram', move: true, title: 'Ábrelo en el navegador',
+                        text: 'Estás dentro de la app de Instagram. Toca ⋯ arriba a la derecha → <b>Abrir en el navegador</b>, o copia el enlace de esta web.' }
+  };
+  function detect() {
+    var ua = navigator.userAgent;
+    if (/Instagram|FBAN|FBAV/.test(ua)) return 'inapp';
+    var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (ios) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua) ? 'other-ios' : 'safari-ios';
+    if (/Android/.test(ua)) return /Firefox/.test(ua) ? 'firefox-android' : 'chrome-android';
+    if (/Firefox/.test(ua)) return 'firefox';
+    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) return 'safari-mac';
+    return 'chrome';
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var steps = [].slice.call(document.querySelectorAll('.wstep'));
+  var done = lsGet('iu_wiz_done') || {};
+  function paintSteps() {
+    var current = 0;
+    steps.forEach(function (li, i) {
+      var n = li.getAttribute('data-step');
+      li.classList.toggle('done', !!done[n]);
+      if (!done[n] && !current) current = i + 1;
+    });
+    steps.forEach(function (li, i) { li.classList.toggle('current', i + 1 === current); });
+  }
+  function apply(key) {
+    var c = P[key] || P.chrome;
+    $('wiz-device').textContent = c.dev;
+    $('wiz-select').value = key;
+    $('wiz-move').hidden = !c.move;
+    $('wiz-steps').hidden = !!c.move;
+    if (c.move) {
+      $('wiz-move-title').textContent = c.title;
+      $('wiz-move-text').innerHTML = c.text;
+      $('wiz-move-get').hidden = !c.get;
+      if (c.get) { $('wiz-move-get').href = c.get; $('wiz-move-get').firstChild.nodeValue = c.getLabel + ' '; }
+      return;
+    }
+    $('mgr-name').textContent = c.mgr;
+    $('mgr-text').innerHTML = c.text;
+    $('mgr-link').href = c.url;
+    $('mgr-link').firstChild.nodeValue = (c.mgr === 'Userscripts' ? 'Descargar app' : 'Instalar extensión') + ' ';
+    $('mgr-tip').hidden = !c.tip;
+    if (c.tip) $('mgr-tip').innerHTML = c.tip;
+    $('us-text').innerHTML = c.us || 'Se abrirá la pantalla de ' + c.mgr + '. Pulsa <b>Instalar</b> (o <b>Confirmar instalación</b>).';
+    paintSteps();
+  }
+  apply(detect());
+  $('wiz-select').addEventListener('change', function (e) { apply(e.target.value); });
+  [['mgr-link', 1], ['us-link', 2], ['ig-link', 3]].forEach(function (p) {
+    $(p[0]).addEventListener('click', function () { done[p[1]] = true; lsSet('iu_wiz_done', done); setTimeout(paintSteps, 400); });
+  });
+  $('wiz-copy-link').addEventListener('click', function () { copyText(location.href.split('#')[0] + '#instalar', '✓ Enlace copiado. Pégalo en el otro navegador'); });
+
+  // copy fallbacks
+  var cache = {};
+  function load(file) { if (!cache[file]) cache[file] = fetch(file).then(function (r) { if (!r.ok) throw 0; return r.text(); }); return cache[file]; }
+  load('instagram-unfollowers.user.js').catch(function () {});
+  load('bookmarklet.txt').catch(function () {});
+  var texts = {};
+  load('instagram-unfollowers.user.js').then(function (t) { texts.us = t; }, function () {});
+  load('bookmarklet.txt').then(function (t) { texts.mark = t; }, function () {});
+  document.querySelectorAll('.js-copy-us').forEach(function (b) {
+    b.addEventListener('click', function () { texts.us ? copyText(texts.us, '✓ Código copiado. Pégalo en un script nuevo de la extensión') : say('Cargando… pulsa otra vez en un segundo'); });
+  });
+  document.querySelectorAll('.js-copy-mark').forEach(function (b) {
+    b.addEventListener('click', function () { texts.mark ? copyText(texts.mark, '✓ Marcador copiado. Ahora crea el marcador') : say('Cargando… pulsa otra vez en un segundo'); });
+  });
+
+  // Install this page as an app (Android/desktop Chrome). iPhone: Share → Add to Home Screen.
+  var deferred = null, btn = $('install-btn');
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; btn.hidden = false; });
+  var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (isIOS && !standalone) btn.hidden = false;
+  btn.addEventListener('click', function () {
+    if (deferred) { deferred.prompt(); deferred.userChoice.finally(function () { deferred = null; btn.hidden = true; }); }
+    else if (isIOS) say('En Safari: toca Compartir y luego "Añadir a pantalla de inicio"');
+    else say('Abre el menú del navegador y toca "Instalar app" o "Añadir a pantalla de inicio"');
+  });
+  window.addEventListener('appinstalled', function () { btn.hidden = true; say('✓ App instalada'); });
+
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.ai|claudeusercontent/.test(location.hostname)) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+
+/* ---------- tilt + spotlight ---------- */
+(function () {
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!fine) return;
+  document.querySelectorAll('.tilt').forEach(function (el) {
+    var max = parseFloat(el.getAttribute('data-tilt-max')) || 5;
+    el.addEventListener('pointermove', function (e) {
+      var r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      el.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+      el.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      if (reduce) return;
+      el.classList.add('is-live');
+      el.style.setProperty('--ry', ((x - 0.5) * 2 * max).toFixed(2) + 'deg');
+      el.style.setProperty('--rx', ((0.5 - y) * 2 * max).toFixed(2) + 'deg');
+    });
+    el.addEventListener('pointerleave', function () {
+      el.classList.remove('is-live');
+      el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg');
+    });
+  });
+  // hero parallax: cards and sticker drift with the cursor
+  if (reduce) return;
+  var hero = document.querySelector('.hero'), items = [].slice.call(document.querySelectorAll('.float,.sticker'));
+  hero.addEventListener('pointermove', function (e) {
+    var r = hero.getBoundingClientRect(), dx = (e.clientX - r.left) / r.width - 0.5, dy = (e.clientY - r.top) / r.height - 0.5;
+    items.forEach(function (el, i) { var k = [26, -22, 14][i] || 16; el.style.translate = (dx * k).toFixed(1) + 'px ' + (dy * k).toFixed(1) + 'px'; });
+  });
+  hero.addEventListener('pointerleave', function () { items.forEach(function (el) { el.style.translate = '0 0'; }); });
+})();
+/* ---------- walking crowd (canvas + GSAP) ---------- */
+(function () {
+  var canvas = document.getElementById('crowd');
+  if (!canvas || !window.gsap) return;
+  var ctx = canvas.getContext('2d');
+  var COLS = 8, ROWS = 6, SRC_SCALE = 0.5; // sheet is drawn at 2x
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stage = { width: 0, height: 0 }, all = [], available = [], crowd = [], scale = 1;
+  var rand = function (a, b) { return a + Math.random() * (b - a); };
+  var img = new Image();
+  img.onload = init;
+  img.src = 'img/peeps.webp';
+
+  function makePeep(rect) {
+    return { rect: rect, w: rect[2], h: rect[3], x: 0, y: 0, jy: 0, anchorY: 0, scaleX: 1, walk: null, hopping: false };
+  }
+  function reset(p) {
+    var dir = Math.random() > 0.5 ? 1 : -1;
+    var w = p.w * scale, h = p.h * scale;
+    var offY = 60 - 170 * gsap.parseEase('power2.in')(Math.random());
+    var startY = stage.height - h + offY, startX, endX;
+    if (dir === 1) { startX = -w; endX = stage.width; p.scaleX = 1; }
+    else { startX = stage.width + w; endX = 0; p.scaleX = -1; }
+    p.x = startX; p.y = startY; p.anchorY = startY;
+    return { startY: startY, endX: endX };
+  }
+  function walk(p, props) {
+    var tl = gsap.timeline();
+    tl.timeScale(rand(0.5, 1.5));
+    tl.to(p, { duration: 10, x: props.endX, ease: 'none' }, 0);
+    tl.to(p, { duration: 0.25, repeat: 40, yoyo: true, y: props.startY - 10 }, 0);
+    return tl;
+  }
+  function add() {
+    var p = available.splice((Math.random() * available.length) | 0, 1)[0];
+    p.walk = walk(p, reset(p)).eventCallback('onComplete', function () {
+      crowd.splice(crowd.indexOf(p), 1); available.push(p); add();
+    });
+    crowd.push(p);
+    crowd.sort(function (a, b) { return a.anchorY - b.anchorY; });
+    return p;
+  }
+  function render() {
+    var dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (var i = 0; i < crowd.length; i++) {
+      var p = crowd[i];
+      ctx.save();
+      ctx.translate(p.x, p.y + p.jy);
+      ctx.scale(p.scaleX, 1);
+      ctx.drawImage(img, p.rect[0], p.rect[1], p.rect[2], p.rect[3], 0, 0, p.w * scale, p.h * scale);
+      ctx.restore();
+    }
+  }
+  function resize() {
+    var dpr = window.devicePixelRatio || 1;
+    stage.width = canvas.clientWidth; stage.height = canvas.clientHeight;
+    canvas.width = stage.width * dpr; canvas.height = stage.height * dpr;
+    scale = SRC_SCALE * (stage.width < 720 ? 0.72 : 1);
+    crowd.forEach(function (p) { p.walk.kill(); });
+    crowd.length = 0; available.length = 0; available.push.apply(available, all);
+    // fewer people on narrow screens
+    var keep = stage.width < 720 ? 22 : all.length;
+    available.sort(function () { return Math.random() - 0.5; }).splice(keep);
+    while (available.length) add().walk.progress(Math.random());
+    if (reduce) { crowd.forEach(function (p) { p.walk.pause(); }); render(); }
+  }
+  function init() {
+    var cw = img.naturalWidth / COLS, ch = img.naturalHeight / ROWS;
+    for (var i = 0; i < COLS * ROWS; i++) all.push(makePeep([(i % COLS) * cw, ((i / COLS) | 0) * ch, cw, ch]));
+    resize();
+    if (!reduce) gsap.ticker.add(render);
+    var hint = document.getElementById('crowd-hint');
+    function hop(p, power) {
+      if (p.hopping) return;
+      p.hopping = true;
+      gsap.to(p, { jy: -(power || 46), duration: 0.22, ease: 'power2.out', yoyo: true, repeat: 1,
+        onComplete: function () { p.hopping = false; } });
+      if (reduce && !hop.on) { hop.on = true; gsap.ticker.add(render); }
+    }
+    function hit(e) {
+      var r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, found = [];
+      for (var i = 0; i < crowd.length; i++) {
+        var p = crowd[i], w = p.w * scale, h = p.h * scale;
+        var left = p.scaleX === 1 ? p.x : p.x - w;
+        if (mx >= left + w * 0.25 && mx <= left + w * 0.75 && my >= p.y + h * 0.08 && my <= p.y + h) found.push(p);
+      }
+      return found;
+    }
+    canvas.addEventListener('pointermove', function (e) {
+      var f = hit(e); if (f.length) { hop(f[f.length - 1]); if (hint) hint.classList.add('gone'); }
+    });
+    canvas.addEventListener('click', function (e) {
+      var r = canvas.getBoundingClientRect(), mx = e.clientX - r.left;
+      crowd.forEach(function (p) {
+        var cx = p.x + (p.scaleX === 1 ? 1 : -1) * p.w * scale / 2, d = Math.abs(cx - mx);
+        if (d < 260) setTimeout(function () { hop(p, 70 - d / 6); }, d * 1.6);
+      });
+      if (hint) hint.classList.add('gone');
+    });
+    var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 150); });
+  }
+})();
+</script>
