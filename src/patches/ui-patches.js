@@ -127,6 +127,32 @@ module.exports = [
   },
 
   /* ------------------------------------------------------------------
+   * Launch screen — glow horizon instead of the orbit + floating cards
+   * (pure-CSS take on GlowHorizon; styles in theme.css "Launch screen")
+   * ------------------------------------------------------------------ */
+  {
+    label: 'Launch screen: glow horizon replaces the decorative panel',
+    from: 'a.default.createElement("div",{className:"launch-panel","aria-hidden":"true"},a.default.createElement("div",{className:"scan-orbit"},a.default.createElement("span",null),a.default.createElement("span",null),a.default.createElement("span",null)),a.default.createElement("div",{className:"signal-card primary"},a.default.createElement("span",null,(0,i.t)(n,"ready")),a.default.createElement("strong",null,r?"".concat(r.results.length):"0%")),a.default.createElement("div",{className:"signal-card"},a.default.createElement("span",null,(0,i.t)(n,"protected")),a.default.createElement("strong",null,(0,i.t)(n,"whitelist"))),a.default.createElement("div",{className:"signal-card accent"},a.default.createElement("span",null,(0,i.t)(n,"review")),a.default.createElement("strong",null,(0,i.t)(n,"selectFirst"))))',
+    to: 'a.default.createElement("div",{className:"glow-horizon","aria-hidden":"true"},a.default.createElement("i",{className:"gh-rim"}),a.default.createElement("i",{className:"gh-lime"}),a.default.createElement("i",{className:"gh-blue"}),a.default.createElement("i",{className:"gh-shade"}))',
+  },
+  { label: 'Launch copy EN: eyebrow', from: 'localAccountAudit:"Local account audit"', to: 'localAccountAudit:"Free · no password"' },
+  { label: 'Launch copy EN: title', from: 'launchTitle:"Find the follows that do not follow back."', to: 'launchTitle:"Who doesn\'t follow you back?"' },
+  {
+    label: 'Launch copy EN: description',
+    from: 'launchDescription:"Scan your Instagram follows, review risk signals, protect whitelisted accounts, and act only on the users you select."',
+    to: 'launchDescription:"Scan your account, review the list and unfollow only the people you choose."',
+  },
+  { label: 'Launch copy EN: note', from: 'runsInBrowserOnly:"Runs in this browser session only"', to: 'runsInBrowserOnly:"Nothing leaves your browser"' },
+  { label: 'Launch copy ES: eyebrow', from: 'localAccountAudit:"Auditoría local de cuenta"', to: 'localAccountAudit:"Gratis · sin contraseña"' },
+  { label: 'Launch copy ES: title', from: 'launchTitle:"Encuentra a quienes sigues pero no te siguen de vuelta."', to: 'launchTitle:"¿Quién no te sigue de vuelta?"' },
+  {
+    label: 'Launch copy ES: description',
+    from: 'launchDescription:"Escanea tus seguidos de Instagram, analiza señales de riesgo, protege cuentas en lista blanca y actúa solo sobre los usuarios seleccionados."',
+    to: 'launchDescription:"Escanea tu cuenta, revisa la lista y deja de seguir solo a quien tú elijas."',
+  },
+  { label: 'Launch copy ES: note', from: 'runsInBrowserOnly:"Se ejecuta solo en esta sesión del navegador"', to: 'runsInBrowserOnly:"Nada sale de tu navegador"' },
+
+  /* ------------------------------------------------------------------
    * Radar — records the scan the app already does (no extra requests)
    * ------------------------------------------------------------------ */
   {

@@ -40,11 +40,13 @@ test('output contains every patch', () => {
     '((h=p)&&IUE.radar.commit(I),h||d.length>0)',
     'className:"icon-button radar-button"',
     '.iue-radar',
+    'className:"glow-horizon"',
   ]) {
     assert.ok(out.includes(marker), 'missing: ' + marker);
   }
   assert.ok(!out.includes('fetch((0,b.unfollowUserUrlGenerator)'), 'old unverified unfollow call is still present');
   assert.ok(!out.includes('confirm((0,c.t)(g,"unfollowConfirm"))'), 'native confirm() still used before unfollowing');
+  assert.ok(!out.includes('className:"signal-card'), 'old floating cards still in the launch screen');
 });
 
 test('mobile builds: userscript and bookmarklet are valid', () => {
