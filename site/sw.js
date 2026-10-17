@@ -1,6 +1,6 @@
 // Offline support: cache the page and its assets; scripts are always fetched fresh when online.
-const CACHE = 'unfollowers-v4';
-const ASSETS = ['/', '/index.html', '/img/peeps.webp', '/img/resumen.webp', '/img/icon-192.png', '/manifest.webmanifest'];
+const CACHE = 'unfollowers-v5';
+const ASSETS = ['/', '/index.html', '/img/peeps.webp', '/img/resumen.webp', '/img/icon-192.png?v=2', '/img/favicon-32.png?v=2', '/manifest.webmanifest'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

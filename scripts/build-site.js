@@ -40,7 +40,8 @@ const html = `<!doctype html>
 <meta property="og:type" content="website">
 <meta property="og:image" content="img/resumen.webp">
 ${headTags.join('\n')}
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230b2bff'/%3E%3Ccircle cx='32' cy='32' r='14' fill='%23d6ff1a'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64.png?v=2">
 </head>
 <body>
 ${body}
