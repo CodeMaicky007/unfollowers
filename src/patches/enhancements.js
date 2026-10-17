@@ -14,8 +14,11 @@
  *   - keyboard shortcuts ( / ← → T ? Esc )
  *   - light / dark theme
  *   - tx()  ES/EN strings for texts that were hard-coded in English
+ *   - radar  own-account changes between complete scans (lost, new, fans, history, CSV)
+ *
+ * `radarCore` is src/patches/radar.js, passed in by the build.
  */
-module.exports = function createEnhancements() {
+module.exports = function createEnhancements(radarCore) {
   var doc = document;
 
   /* ---------------- storage + language ---------------- */
@@ -42,7 +45,24 @@ module.exports = function createEnhancements() {
       onlyIg: 'Este script solo funciona en www.instagram.com',
       noWlExport: 'No hay usuarios en la lista blanca para exportar',
       wlReplaced: 'Lista blanca sustituida: %s usuarios', wlAdded: 'Añadidos %s usuarios nuevos',
-      min: 'min', sec: 's', h: 'h'
+      min: 'min', sec: 's', h: 'h',
+      radar: 'Radar', radarLead: 'Cambios en tu cuenta entre un escaneo completo y el siguiente.', demo: 'Demo',
+      r_lost: 'Se fueron', r_new: 'Nuevos', r_fans: 'Fans', r_history: 'Historial',
+      r_last: 'Último escaneo', r_followers: 'Seguidores', r_following: 'Seguidos', r_mutual: 'Mutuos',
+      r_empty: 'Todavía no hay datos. Haz un escaneo completo y el Radar guardará la primera foto de tu cuenta.',
+      r_firstLost: 'Primer escaneo guardado. En el próximo verás quién te dejó de seguir.',
+      r_firstNew: 'Primer escaneo guardado. En el próximo verás tus seguidores nuevos.',
+      r_noneLost: 'Nadie te ha dejado de seguir desde que usas el Radar.',
+      r_noneNew: 'Sin seguidores nuevos todavía.',
+      r_noneFans: 'Sigues a todas las cuentas que te siguen.',
+      r_noSnap: 'La lista completa no cupo en el almacenamiento del navegador. Se guardó solo el historial.',
+      r_lostNote: 'Incluye cuentas que se desactivaron o te bloquearon.',
+      r_fansNote: 'Te siguen y tú no les sigues.',
+      r_oneScan: 'Haz otro escaneo completo para ver la evolución.',
+      r_date: 'Fecha', r_user: 'Usuario', r_name: 'Nombre', r_profile: 'Perfil', r_verified: 'Verificada', r_private: 'Privada',
+      r_export: 'Exportar CSV', r_showMore: 'Mostrar %s más', r_toastFirst: 'Radar: primer escaneo guardado',
+      r_toast: 'Radar: %s', r_toastLost: '%s se fueron', r_toastNew: '%s nuevos', r_toastNone: 'sin cambios', r_open: 'Ver',
+      k_radar: 'Abrir el Radar'
     },
     en: {
       theme: 'Toggle light/dark theme',
@@ -61,7 +81,24 @@ module.exports = function createEnhancements() {
       onlyIg: 'Can be used only on www.instagram.com',
       noWlExport: 'No users in whitelist to export',
       wlReplaced: 'Replaced whitelist with %s users', wlAdded: 'Added %s new users',
-      min: 'min', sec: 's', h: 'h'
+      min: 'min', sec: 's', h: 'h',
+      radar: 'Radar', radarLead: 'Changes in your account from one complete scan to the next.', demo: 'Demo',
+      r_lost: 'Left', r_new: 'New', r_fans: 'Fans', r_history: 'History',
+      r_last: 'Last scan', r_followers: 'Followers', r_following: 'Following', r_mutual: 'Mutual',
+      r_empty: 'No data yet. Run a complete scan and Radar will save the first snapshot of your account.',
+      r_firstLost: 'First scan saved. After the next one you will see who unfollowed you.',
+      r_firstNew: 'First scan saved. After the next one you will see your new followers.',
+      r_noneLost: 'Nobody has unfollowed you since you started using Radar.',
+      r_noneNew: 'No new followers yet.',
+      r_noneFans: 'You follow back everyone who follows you.',
+      r_noSnap: 'The full list did not fit in browser storage. Only the history was saved.',
+      r_lostNote: 'Includes accounts that were deactivated or blocked you.',
+      r_fansNote: 'They follow you and you do not follow them.',
+      r_oneScan: 'Run another complete scan to see the trend.',
+      r_date: 'Date', r_user: 'Username', r_name: 'Name', r_profile: 'Profile', r_verified: 'Verified', r_private: 'Private',
+      r_export: 'Export CSV', r_showMore: 'Show %s more', r_toastFirst: 'Radar: first scan saved',
+      r_toast: 'Radar: %s', r_toastLost: '%s left', r_toastNew: '%s new', r_toastNone: 'no changes', r_open: 'View',
+      k_radar: 'Open Radar'
     }
   };
   function tx(l, k, a) { var d = TX[curLang(l)]; var s = d[k] != null ? d[k] : (TX.en[k] || k); return a == null ? s : String(s).replace('%s', a); }
@@ -245,19 +282,233 @@ module.exports = function createEnhancements() {
     });
     g.fillStyle = 'rgba(255,255,255,0.75)'; g.font = '600 34px ' + BODY;
     g.fillText(tx(l, 'of', s.total), 90, 1200);
-    c.toBlob(function (blob) {
-      if (!blob) return;
-      var a = doc.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'resumen-unfollowers.png';
-      doc.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
-    }, 'image/png');
+    c.toBlob(function (blob) { if (blob) saveBlob(blob, 'resumen-unfollowers.png'); }, 'image/png');
+  }
+  function saveBlob(blob, name) {
+    var a = doc.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    doc.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+  }
+
+  /* ---------------- radar (own account only) ---------------- */
+  var R = radarCore;
+  var IS_DEMO = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var RADAR_TABS = ['lost', 'new', 'fans', 'history'];
+  var RADAR_PAGE = 100;
+  var radarBuf = null;
+  function storage() { try { return window.localStorage; } catch (e) { return null; } }
+
+  // Called from the bundle's scan loop (see ui-patches.js). Only a complete scan reaches commit().
+  function radarBegin() { radarBuf = { followers: [], following: [] }; }
+  function radarAddFollower(u) { if (radarBuf && u) radarBuf.followers.push(R.compactUser(u)); }
+  function radarAddFollowing(u) { if (radarBuf && u) radarBuf.following.push(R.compactUser(u)); }
+  function radarCommit(l) {
+    var b = radarBuf, st = storage();
+    radarBuf = null;
+    if (!b || !st) return;
+    try { radarToast(R.commitScan(st, b.followers, b.following, Date.now()), l); } catch (e) { console.warn('Radar could not save the scan:', e); }
+  }
+
+  function memStore() {
+    var m = {};
+    return { getItem: function (k) { return k in m ? m[k] : null; }, setItem: function (k, v) { m[k] = String(v); }, removeItem: function (k) { delete m[k]; } };
+  }
+  // Sample history for localhost previews, built with the real diffing logic. Never stored.
+  function demoData() {
+    var names = ['lucia.mtz', 'pablo_rv', 'sara.design', 'dani.fit', 'marta.viajes', 'alex_dev', 'nora.foto', 'ivan.music', 'carla_ok', 'leo.surf', 'eva.cocina', 'hugo.art',
+      'julia.run', 'tomas.gg', 'paula.lee', 'raul_bcn', 'ines.ph', 'mario.dj', 'vera.ink', 'oscar.bk', 'lola.mood', 'gael.skt', 'ana.libros', 'diego.fx'];
+    var users = names.map(function (n, i) {
+      var first = n.split(/[._]/)[0];
+      return R.compactUser({ pk: 1000 + i, username: n, full_name: first.charAt(0).toUpperCase() + first.slice(1), is_verified: i % 9 === 0, is_private: i % 4 === 0 });
+    });
+    var st = memStore(), day = 864e5, now = Date.now();
+    var following = users.slice(0, 6).concat(users.slice(14, 17));
+    var windows = [[0, 18], [0, 19], [1, 20], [1, 22], [3, 22], [3, 24]];
+    windows.forEach(function (w, i) { R.commitScan(st, users.slice(w[0], w[1]), following, now - (windows.length - 1 - i) * 3 * day); });
+    return { snap: R.loadSnapshot(st), hist: R.loadHistory(st), demo: true };
+  }
+  function radarData() {
+    var st = storage();
+    var d = { snap: st ? R.loadSnapshot(st) : null, hist: st ? R.loadHistory(st) : [], demo: false };
+    return !d.snap && !d.hist.length && IS_DEMO ? demoData() : d;
+  }
+
+  function fmtDate(t, l, withTime) {
+    var o = { day: 'numeric', month: 'short', year: 'numeric' };
+    if (withTime) { o.hour = '2-digit'; o.minute = '2-digit'; }
+    try { return new Date(t).toLocaleString(curLang(l) === 'es' ? 'es-ES' : 'en-GB', o); } catch (e) { return isoDay(t); }
+  }
+  function isoDay(t) { return new Date(t).toISOString().slice(0, 10); }
+  function profileUrl(u) { return 'https://www.instagram.com/' + encodeURIComponent(u) + '/'; }
+  function avatarHtml(u) {
+    return u.p
+      ? '<img class="iue-av" alt="" loading="lazy" referrerpolicy="no-referrer" src="' + esc(u.p) + '">'
+      : '<span class="iue-av iue-letter" aria-hidden="true">' + esc((u.u || '?').charAt(0).toUpperCase()) + '</span>';
+  }
+  function userRow(u, meta) {
+    return '<li>' + avatarHtml(u) +
+      '<div><a href="' + esc(profileUrl(u.u)) + '" target="_blank" rel="noopener noreferrer">@' + esc(u.u) + '</a>' + (u.n ? '<span>' + esc(u.n) + '</span>' : '') + '</div>' +
+      (meta ? '<em>' + meta + '</em>' : '') + '</li>';
+  }
+
+  // One tab = its rows, how to draw a row, the empty message and the CSV export.
+  function radarView(d, tab, l) {
+    var first = d.hist.length < 2;
+    if (tab === 'lost' || tab === 'new') {
+      var lost = tab === 'lost', log = lost ? R.lostLog(d.hist) : R.gainedLog(d.hist);
+      return {
+        rows: log, note: lost ? tx(l, 'r_lostNote') : '',
+        empty: tx(l, first ? (lost ? 'r_firstLost' : 'r_firstNew') : (lost ? 'r_noneLost' : 'r_noneNew')),
+        row: function (u) { return userRow(u, esc(fmtDate(u.t, l))); },
+        csv: function () {
+          return R.toCsv([tx(l, 'r_date'), tx(l, 'r_user'), tx(l, 'r_name'), tx(l, 'r_profile')],
+            log.map(function (u) { return [isoDay(u.t), u.u, u.n, profileUrl(u.u)]; }));
+        }
+      };
+    }
+    if (tab === 'fans') {
+      var fans = d.snap ? R.fansOf(d.snap.followers, d.snap.following) : [];
+      return {
+        rows: fans, note: tx(l, 'r_fansNote'),
+        empty: tx(l, d.snap ? 'r_noneFans' : 'r_noSnap'),
+        row: function (u) {
+          var tags = (u.v ? '<i class="iue-badge">✓</i>' : '') + (u.pr ? '<i class="iue-badge">' + esc(tx(l, 'r_private')) + '</i>' : '');
+          return userRow(u, tags);
+        },
+        csv: function () {
+          return R.toCsv([tx(l, 'r_user'), tx(l, 'r_name'), tx(l, 'r_verified'), tx(l, 'r_private'), tx(l, 'r_profile')],
+            fans.map(function (u) { return [u.u, u.n, u.v ? 1 : 0, u.pr ? 1 : 0, profileUrl(u.u)]; }));
+        }
+      };
+    }
+    var hist = d.hist;
+    return {
+      rows: hist, note: first ? tx(l, 'r_oneScan') : '', empty: '', history: true,
+      csv: function () {
+        return R.toCsv([tx(l, 'r_date'), tx(l, 'r_followers'), tx(l, 'r_following'), tx(l, 'r_mutual'), tx(l, 'r_lost'), tx(l, 'r_new')],
+          hist.map(function (e) { return [new Date(e.t).toISOString(), e.followers, e.following, e.mutual, e.lost.length, e.gained.length]; }));
+      }
+    };
+  }
+
+  function chartSvg(hist, l) {
+    var W = 600, H = 220, L = 46, Rp = 14, T = 14, B = 28;
+    var pts = hist.slice(-60), vals = [];
+    pts.forEach(function (e) { vals.push(e.followers, e.following); });
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    if (max === min) { max += 1; min = Math.max(0, min - 1); }
+    function x(i) { return L + (pts.length === 1 ? (W - L - Rp) / 2 : i * (W - L - Rp) / (pts.length - 1)); }
+    function y(v) { return T + (max - v) * (H - T - B) / (max - min); }
+    function series(key, cls, label) {
+      var pl = pts.map(function (e, i) { return x(i).toFixed(1) + ',' + y(e[key]).toFixed(1); }).join(' ');
+      return '<polyline class="' + cls + '" points="' + pl + '"/>' + pts.map(function (e, i) {
+        return '<circle class="' + cls + '" cx="' + x(i).toFixed(1) + '" cy="' + y(e[key]).toFixed(1) + '" r="4.5"><title>' + esc(label + ': ' + e[key] + ' · ' + fmtDate(e.t, l)) + '</title></circle>';
+      }).join('');
+    }
+    var grid = [max, Math.round((max + min) / 2), min].map(function (v) {
+      return '<line class="iue-grid-line" x1="' + L + '" x2="' + (W - Rp) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/>' +
+        '<text x="' + (L - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + v + '</text>';
+    }).join('');
+    var dates = '<text x="' + L + '" y="' + (H - 6) + '">' + esc(fmtDate(pts[0].t, l)) + '</text>' +
+      (pts.length > 1 ? '<text x="' + (W - Rp) + '" y="' + (H - 6) + '" text-anchor="end">' + esc(fmtDate(pts[pts.length - 1].t, l)) + '</text>' : '');
+    return '<div class="iue-legend"><span class="s-followers">' + esc(tx(l, 'r_followers')) + '</span><span class="s-following">' + esc(tx(l, 'r_following')) + '</span></div>' +
+      '<div class="iue-chart-wrap"><svg class="iue-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(tx(l, 'r_history')) + '">' +
+      grid + dates + series('following', 's-following', tx(l, 'r_following')) + series('followers', 's-followers', tx(l, 'r_followers')) + '</svg></div>';
+  }
+  function historyTable(hist, l) {
+    var rows = hist.slice().reverse().map(function (e, i, arr) {
+      var prev = arr[i + 1], delta = prev ? e.followers - prev.followers : 0;
+      var dl = prev && delta ? ' <small class="' + (delta > 0 ? 'up' : 'down') + '">' + (delta > 0 ? '+' : '') + delta + '</small>' : '';
+      return '<tr><td>' + esc(fmtDate(e.t, l, true)) + '</td><td>' + e.followers + dl + '</td><td>' + e.following + '</td><td>' + e.lost.length + '</td><td>' + e.gained.length + '</td></tr>';
+    }).join('');
+    return '<div class="iue-table-wrap"><table class="iue-table"><thead><tr><th>' + esc(tx(l, 'r_date')) + '</th><th>' + esc(tx(l, 'r_followers')) + '</th><th>' +
+      esc(tx(l, 'r_following')) + '</th><th>' + esc(tx(l, 'r_lost')) + '</th><th>' + esc(tx(l, 'r_new')) + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function openRadar(l, tab) {
+    l = curLang(l);
+    var d = radarData();
+    var state = { tab: RADAR_TABS.indexOf(tab) >= 0 ? tab : 'lost', shown: RADAR_PAGE };
+    var root = modal('', 'iue-radar');
+    var box = root.querySelector('.iue-modal');
+    var last = d.hist[d.hist.length - 1];
+    var views = {};
+    RADAR_TABS.forEach(function (t) { views[t] = radarView(d, t, l); });
+
+    function body(v) {
+      if (!last) return '<p class="iue-empty">' + esc(tx(l, 'r_empty')) + '</p>';
+      var note = v.note ? '<p class="iue-note">' + esc(v.note) + '</p>' : '';
+      if (v.history) return note + chartSvg(d.hist, l) + historyTable(d.hist, l);
+      if (!v.rows.length) return '<p class="iue-empty">' + esc(v.empty) + '</p>';
+      var more = v.rows.length - state.shown;
+      return note + '<ul class="iue-list">' + v.rows.slice(0, state.shown).map(v.row).join('') + '</ul>' +
+        (more > 0 ? '<button type="button" class="iue-btn iue-more-btn" data-a="more">' + esc(tx(l, 'r_showMore', Math.min(more, RADAR_PAGE))) + '</button>' : '');
+    }
+    function render(focusTab) {
+      var v = views[state.tab];
+      box.innerHTML =
+        '<div class="iue-radar-head"><h2>' + esc(tx(l, 'radar')) + '</h2>' + (d.demo ? '<span class="iue-tag">' + esc(tx(l, 'demo')) + '</span>' : '') + '</div>' +
+        '<p class="iue-lead">' + esc(tx(l, 'radarLead')) + '</p>' +
+        (last ? '<div class="iue-chips"><span>' + esc(tx(l, 'r_last')) + ': <b>' + esc(fmtDate(last.t, l, true)) + '</b></span>' +
+          '<span>' + esc(tx(l, 'r_followers')) + ': <b>' + last.followers + '</b></span>' +
+          '<span>' + esc(tx(l, 'r_following')) + ': <b>' + last.following + '</b></span>' +
+          '<span>' + esc(tx(l, 'r_mutual')) + ': <b>' + last.mutual + '</b></span></div>' : '') +
+        '<div class="iue-tabs" role="tablist">' + RADAR_TABS.map(function (t) {
+          var on = t === state.tab;
+          return '<button type="button" role="tab" data-tab="' + t + '" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '"' + (on ? ' class="on"' : '') + '>' +
+            esc(tx(l, 'r_' + t)) + ' <b>' + views[t].rows.length + '</b></button>';
+        }).join('') + '</div>' +
+        '<div class="iue-radar-body" role="tabpanel">' + body(v) + '</div>' +
+        '<div class="iue-actions"><button type="button" data-a="csv" class="iue-btn"' + (last && v.rows.length ? '' : ' disabled') + '>' + esc(tx(l, 'r_export')) + '</button>' +
+        '<button type="button" data-a="close" class="iue-btn iue-primary">' + esc(tx(l, 'close')) + '</button></div>';
+      wireAvatars(box);
+      box.querySelectorAll('[data-tab]').forEach(function (b) {
+        b.addEventListener('click', function () { state.tab = b.getAttribute('data-tab'); state.shown = RADAR_PAGE; render(true); });
+        b.addEventListener('keydown', function (e) {
+          var i = RADAR_TABS.indexOf(state.tab), step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (!step) return;
+          e.preventDefault(); e.stopPropagation();
+          state.tab = RADAR_TABS[(i + step + RADAR_TABS.length) % RADAR_TABS.length]; state.shown = RADAR_PAGE; render(true);
+        });
+      });
+      var more = box.querySelector('[data-a=more]');
+      if (more) more.addEventListener('click', function () { state.shown += RADAR_PAGE; render(); });
+      box.querySelector('[data-a=close]').addEventListener('click', closeModal);
+      box.querySelector('[data-a=csv]').addEventListener('click', function () {
+        saveBlob(new Blob([v.csv()], { type: 'text/csv;charset=utf-8' }), 'radar-' + state.tab + '-' + isoDay(Date.now()) + '.csv');
+      });
+      var f = box.querySelector(focusTab ? '[data-tab].on' : '[data-a=close]');
+      if (f) f.focus();
+    }
+    render();
+  }
+
+  var toastEl = null, toastTimer = 0;
+  function radarToast(res, l) {
+    if (toastEl) toastEl.remove();
+    var parts = [];
+    if (res.lost.length) parts.push(tx(l, 'r_toastLost', res.lost.length));
+    if (res.gained.length) parts.push(tx(l, 'r_toastNew', res.gained.length));
+    var text = res.first ? tx(l, 'r_toastFirst') : tx(l, 'r_toast', parts.length ? parts.join(' · ') : tx(l, 'r_toastNone'));
+    var el = doc.createElement('div');
+    el.className = 'iue-root iue-toast';
+    el.setAttribute('role', 'status');
+    el.innerHTML = '<span>' + esc(text) + '</span><button type="button" class="iue-btn iue-primary">' + esc(tx(l, 'r_open')) + '</button>';
+    el.querySelector('button').addEventListener('click', function () {
+      el.remove();
+      openRadar(l, !res.lost.length && res.gained.length ? 'new' : 'lost');
+    });
+    doc.body.appendChild(el);
+    toastEl = el;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { if (el.parentNode) el.remove(); }, 15000);
   }
 
   /* ---------------- help ---------------- */
   function showHelp() {
     var l = curLang();
-    var rows = [['/', 'k_search'], ['← →', 'k_pages'], ['Shift + clic', 'k_shift'], ['T', 'k_theme'], ['?', 'k_help'], ['Esc', 'k_esc']];
+    var rows = [['/', 'k_search'], ['← →', 'k_pages'], ['Shift + clic', 'k_shift'], ['R', 'k_radar'], ['T', 'k_theme'], ['?', 'k_help'], ['Esc', 'k_esc']];
     var root = modal('<h2>' + esc(tx(l, 'help')) + '</h2><dl class="iue-keys">' +
       rows.map(function (r) { return '<dt><kbd>' + esc(r[0]) + '</kbd></dt><dd>' + esc(tx(l, r[1])) + '</dd>'; }).join('') +
       '</dl><div class="iue-actions"><button type="button" class="iue-btn iue-primary" data-a="close">' + esc(tx(l, 'close')) + '</button></div>', 'iue-help');
@@ -282,6 +533,7 @@ module.exports = function createEnhancements() {
     else if (e.key === 'ArrowLeft' && pager[0]) { e.preventDefault(); pager[0].click(); scrollTop(); }
     else if (e.key === 'ArrowRight' && pager[1]) { e.preventDefault(); pager[1].click(); scrollTop(); }
     else if (e.key === 't' || e.key === 'T') { toggleTheme(); }
+    else if (e.key === 'r' || e.key === 'R') { openRadar(); }
     else if (e.key === '?') { showHelp(); }
   });
   function scrollTop() { setTimeout(function () { var r = doc.querySelector('.iu .results-container'); if (r) window.scrollTo({ top: 0, behavior: 'smooth' }); }, 30); }
@@ -329,6 +581,8 @@ module.exports = function createEnhancements() {
   return {
     tx: tx, toggleTheme: toggleTheme,
     sortUsers: sortUsers, setSort: setSort, getSort: getSort, sortOptions: sortOptions, showLetters: showLetters,
-    confirmUnfollow: confirmUnfollow, autoSummary: autoSummary, showSummary: showSummary, showHelp: showHelp
+    confirmUnfollow: confirmUnfollow, autoSummary: autoSummary, showSummary: showSummary, showHelp: showHelp,
+    openRadar: openRadar,
+    radar: { begin: radarBegin, addFollower: radarAddFollower, addFollowing: radarAddFollowing, commit: radarCommit }
   };
 };

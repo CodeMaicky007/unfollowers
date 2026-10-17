@@ -33,6 +33,13 @@ test('output contains every patch', () => {
     'className:"icon-button theme-toggle"',
     'IUE.autoSummary(t.unfollowLog',
     'html[data-iu-theme=\\"dark\\"]', // quotes are escaped inside the CSS string
+    'function createRadarCore()',
+    'IUE.radar.begin(),t=0,',
+    '(0,b.addFollowerToIndex)(e,s),IUE.radar.addFollower(s)',
+    'IUE.radar.addFollowing(s),(0,b.isUserInFollowerIndex)(e,s)',
+    '((h=p)&&IUE.radar.commit(I),h||d.length>0)',
+    'className:"icon-button radar-button"',
+    '.iue-radar',
   ]) {
     assert.ok(out.includes(marker), 'missing: ' + marker);
   }

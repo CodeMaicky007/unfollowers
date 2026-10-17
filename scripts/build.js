@@ -6,6 +6,7 @@
  *   src/patches/ui-patches.js       text patches for markup / behaviour
  *   src/patches/unfollow-verified.js verified unfollow function (inlined)
  *   src/patches/enhancements.js     UI features, inlined as the global IUE
+ *   src/patches/radar.js            radar core (scan diffing), passed to enhancements
  *
  * Usage: node scripts/build.js
  */
@@ -48,11 +49,11 @@ function apply({ label, from, to }) {
   out = out.split(from).join(to);
   console.log('ok   ' + label);
 }
-// Enhancements module, available to every bundle module as the variable IUE.
+// Enhancements module, available to every bundle module as the variable IUE (receives the radar core).
 apply({
   label: 'Enhancements module (IUE)',
   from: '(()=>{"use strict";',
-  to: '(()=>{"use strict";var IUE=(' + moduleSource('src/patches/enhancements.js') + ')();\n',
+  to: '(()=>{"use strict";var IUE=(' + moduleSource('src/patches/enhancements.js') + ')((' + moduleSource('src/patches/radar.js') + ')());\n',
 });
 require(p('src/patches/ui-patches.js')).forEach(apply);
 

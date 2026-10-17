@@ -10,7 +10,14 @@ Esta carpeta es una versión modificada del script original [InstagramUnfollower
 - **Resumen final:** al terminar sale una tarjeta con cuántas cuentas se dejaron de seguir, cuántas fallaron, el porcentaje de éxito y la duración. Se puede descargar como imagen para compartir.
 - **Ordenar** los resultados: A→Z, Z→A, seguidos recientemente, seguidos hace más tiempo, verificados primero, sin foto primero o privadas primero.
 - **Shift + clic** para seleccionar un rango de cuentas.
-- **Atajos de teclado:** `/` buscar · `←` `→` cambiar de página · `T` cambiar de tema · `?` ayuda · `Esc` cerrar.
+- **Radar** (botón ◎ o tecla `R`): compara cada escaneo completo con el anterior, solo de tu propia cuenta y sin peticiones extra a Instagram.
+  - **Se fueron:** quién te dejó de seguir (o desactivó su cuenta), con fecha.
+  - **Nuevos:** quién empezó a seguirte.
+  - **Fans:** quién te sigue y tú no sigues.
+  - **Historial:** gráfica de seguidores y seguidos por escaneo.
+  - **Exportar CSV** en cada pestaña (separado por `;`, se abre bien en Excel en español).
+  - Se guarda en tu navegador (`iu_radar-snapshot` e `iu_radar-history`). Los escaneos interrumpidos no se comparan.
+- **Atajos de teclado:** `/` buscar · `←` `→` cambiar de página · `R` Radar · `T` cambiar de tema · `?` ayuda · `Esc` cerrar.
 - **Modo claro y oscuro**, con un botón en la cabecera. Recuerda lo que elegiste.
 - **En español por defecto:** también los mensajes que antes salían siempre en inglés.
 - **Correcciones:** los botones de la lista blanca ya no cierran los ajustes, vaciar la lista blanca ya no pide confirmarlo dos veces y el orden de la lista ya no se pierde al cambiar de página. Además hay estado vacío, fotos de perfil de reserva, contador de seleccionados y barras de progreso.
@@ -50,7 +57,8 @@ instagram-unfollowers/
 │   ├── styles/theme.css            ← todo el diseño
 │   └── patches/
 │       ├── ui-patches.js           ← cambios de interfaz y correcciones
-│       ├── enhancements.js         ← confirmación, resumen, orden, atajos, tema (IUE)
+│       ├── enhancements.js         ← confirmación, resumen, orden, atajos, tema, panel Radar (IUE)
+│       ├── radar.js                ← lógica del Radar: comparar escaneos, guardar, CSV
 │       └── unfollow-verified.js    ← dejar de seguir con verificación
 ├── scripts/
 │   ├── build.js                    ← une todo en dist/

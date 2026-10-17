@@ -125,4 +125,34 @@ module.exports = [
     from: 'var n=l([],e,!0).sort((function(e,t){return e.username>t.username?1:-1})),r=s.UNFOLLOWERS_PER_PAGE*(t-1)',
     to: 'var n=e,r=s.UNFOLLOWERS_PER_PAGE*(t-1)',
   },
+
+  /* ------------------------------------------------------------------
+   * Radar — records the scan the app already does (no extra requests)
+   * ------------------------------------------------------------------ */
+  {
+    label: 'Radar: start recording when the followers scan starts',
+    from: 'e=(0,b.createFollowerIndex)(),t=0,',
+    to: 'e=(0,b.createFollowerIndex)(),IUE.radar.begin(),t=0,',
+  },
+  {
+    label: 'Radar: record each follower',
+    from: 's=o[i],(0,b.addFollowerToIndex)(e,s),t++;',
+    to: 's=o[i],(0,b.addFollowerToIndex)(e,s),IUE.radar.addFollower(s),t++;',
+  },
+  {
+    label: 'Radar: record each followed account',
+    from: 's=o[i],(0,b.isUserInFollowerIndex)(e,s)||',
+    to: 's=o[i],IUE.radar.addFollowing(s),(0,b.isUserInFollowerIndex)(e,s)||',
+  },
+  {
+    // h is true only when both lists were read to the end; partial scans are never compared.
+    label: 'Radar: save and compare only complete scans',
+    from: '((h=p)||d.length>0)&&((0,E.saveCachedScanResults)(d)',
+    to: '((h=p)&&IUE.radar.commit(I),h||d.length>0)&&((0,E.saveCachedScanResults)(d)',
+  },
+  {
+    label: 'Radar button in the header',
+    from: 's.default.createElement("button",{className:"icon-button theme-toggle"',
+    to: 's.default.createElement("button",{className:"icon-button radar-button",type:"button",title:IUE.tx(v,"radar"),"aria-label":IUE.tx(v,"radar"),onClick:function(){IUE.openRadar(v)}},s.default.createElement("span",{"aria-hidden":"true"},"◎")),s.default.createElement("button",{className:"icon-button theme-toggle"',
+  },
 ];

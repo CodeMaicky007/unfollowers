@@ -15,6 +15,7 @@ Una versión modificada de un script de consola para Instagram ([InstagramUnfoll
 - `src/patches/ui-patches.js` es una lista de `{ label, from, to }`. Cada `from` es texto exacto del bundle y tiene que aparecer **una sola vez**.
 - `src/patches/enhancements.js` es una fábrica autocontenida que el build inserta al inicio del bundle como `var IUE=(...)()`. Todos los módulos del bundle pueden llamar a `IUE.*`. Lo que pinta está fuera del árbol de Preact (clases `iue-*`, añadidas a `<body>`), así que su CSS no lleva el prefijo `.iu` y define sus propias variables en `.iue-root`. Para un texto nuevo, añádelo a su diccionario `TX` en `es` y `en`.
 - Tema: `<html data-iu-theme="light|dark">`. Los colores oscuros se redefinen en `html[data-iu-theme="dark"] .iu` (al final de `theme.css`). Para el color de texto sobre superficies usa `var(--text)`; `--ink` es el negro de los botones y las píldoras.
+- `src/patches/radar.js` es la lógica pura del Radar (comparar escaneos, guardar en `localStorage`, CSV). El build la pasa como argumento a `enhancements.js`, y `tests/radar.test.js` la prueba directamente. Solo se alimenta del escaneo de la propia cuenta (parches `Radar:` en `ui-patches.js`) y solo guarda escaneos completos.
 - `src/patches/unfollow-verified.js` es una función autocontenida que se inserta en el bundle. No puede usar imports ni variables externas, solo APIs del navegador.
 - `scripts/build.js` genera `dist/instagram-unfollowers.js`. **`dist/` es un archivo generado: no lo edites a mano.**
 
