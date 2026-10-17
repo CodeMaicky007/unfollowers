@@ -9,7 +9,7 @@
     "test": "node --test",
     "preview": "node scripts/build.js && node scripts/preview.js",
     "site": "node scripts/build.js && node scripts/build-site.js",
-    "deploy": "npm run site && npx vercel@latest deploy --cwd deploy --prod --yes --project unfollowers"
+    "deploy": "npm run site && vercel deploy --cwd deploy --prod --yes --project unfollowers"
   },
   "engines": {
     "node": ">=18"
